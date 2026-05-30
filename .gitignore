@@ -40,6 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local sqlite db
+# local sqlite db (legacy, no longer used)
 dev.db
 dev.db-*

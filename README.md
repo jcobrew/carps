@@ -46,18 +46,25 @@ without touching the engine.
 
 - **Next.js 16 (App Router) + TypeScript**, Server Actions for all mutations.
 - **Tailwind CSS** for styling.
-- **Drizzle ORM + libSQL/Turso** for persistence — the same code runs against a
-  local SQLite file in dev and hosted Turso in production.
+- **Drizzle ORM + Postgres (Supabase)** for persistence — same code in dev and
+  production; you just point `DATABASE_URL` at your Supabase project.
 - **Vitest** for the engine unit tests.
 
 ## Run it locally
 
+You need a Postgres database — the fastest path is a free [Supabase](https://supabase.com)
+project (the same one you'll use in production):
+
 ```bash
 npm install
-cp .env.example .env.local      # defaults to a local SQLite file (file:./dev.db)
-npm run db:push                 # create the tables
+cp .env.example .env.local      # paste your Supabase connection strings into this
+npm run db:push                 # create the tables (uses DATABASE_URL_DIRECT)
 npm run dev                     # http://localhost:3000
 ```
+
+In Supabase: **Project Settings → Database → Connection string**:
+- Use the **Transaction pooler** URL (port 6543, with `?pgbouncer=true`) for `DATABASE_URL` — the app uses this at runtime.
+- Use the **Direct** URL (port 5432) for `DATABASE_URL_DIRECT` — `db:push` needs it because pgbouncer can't run DDL.
 
 Then walk the whole journey:
 
@@ -80,38 +87,30 @@ npm run engine:demo # prints proposals for a hardcoded 3-person group to the con
 npm run journey     # end-to-end data journey (2–3 members, convergence, reactions) against the DB
 ```
 
-## Deploy (Vercel + Turso)
+## Deploy (Vercel + Supabase)
 
-A local SQLite/JSON file does **not** persist or share across requests on Vercel's
-serverless filesystem, which would break the "two browsers see the same state"
-requirement. Use hosted **Turso** (still libSQL/SQLite) — same code, just env vars.
-
-```bash
-# 1. Create a free Turso DB (https://turso.tech)
-turso db create convergence
-turso db show convergence --url        # -> TURSO_DATABASE_URL
-turso db tokens create convergence     # -> TURSO_AUTH_TOKEN
-
-# 2. Push the schema to it
-TURSO_DATABASE_URL=libsql://... TURSO_AUTH_TOKEN=... npm run db:push
-
-# 3. Deploy to Vercel and set the two env vars in the project settings:
-#    TURSO_DATABASE_URL, TURSO_AUTH_TOKEN
-#    (optionally NEXT_PUBLIC_BASE_URL for nicer absolute invite links)
-vercel
-```
-
-### Share today without deploying
-
-To test with friends in one session from your laptop, expose the local dev server
-with a tunnel:
+Vercel's serverless filesystem is ephemeral, so the database must be hosted.
+**Supabase** (Postgres) is the path here.
 
 ```bash
-npx localtunnel --port 3000      # or: ngrok http 3000
+# 1. Create a free Supabase project (https://supabase.com) and grab two URLs
+#    from Project Settings → Database → Connection string:
+#      - "Transaction pooler" (port 6543, with ?pgbouncer=true) → DATABASE_URL
+#      - "Direct"             (port 5432)                       → DATABASE_URL_DIRECT
+
+# 2. Create the tables. Either run the included SQL file:
+psql "$DATABASE_URL_DIRECT" -f drizzle/0000_init.sql
+# ...or use drizzle-kit:
+DATABASE_URL_DIRECT=... npm run db:push
+
+# 3. On Vercel: Import the GitHub repo, set Production Branch to `convergence`,
+#    and add one env var in Project Settings:
+#       DATABASE_URL = <your Supabase Transaction pooler URL>
+#    Then Deploy. Next.js is auto-detected.
 ```
 
-Share the tunnel URL. (The tunnel dies when your laptop sleeps; use the Turso +
-Vercel deploy for an always-on link.)
+The Supabase **SQL Editor** also works for step 2 — paste the contents of
+`drizzle/0000_init.sql` and run.
 
 ## Known v0 limitations (intentional)
 

@@ -1,26 +1,36 @@
 /**
- * Database schema (Drizzle + libSQL/SQLite).
+ * Database schema (Drizzle + Postgres / Supabase).
  *
- * This typed schema doubles as the data-model documentation. The same code runs
- * against a local file (`file:./dev.db`) in development and against Turso (hosted
- * libSQL) in production — only the connection string changes.
- *
- * IDs are nanoid strings; timestamps are epoch milliseconds (integers).
+ * Typed schema doubles as the data-model documentation. Targets standard
+ * Postgres so it runs against Supabase (or any other Postgres host) without
+ * extension dependencies. IDs are nanoid strings; timestamps are epoch ms in
+ * `bigint` columns (epoch ms exceeds Postgres `integer`'s 32-bit range).
  */
-import { sqliteTable, text, integer, real, unique } from 'drizzle-orm/sqlite-core';
+import {
+  pgTable,
+  text,
+  bigint,
+  integer,
+  real,
+  boolean,
+  unique,
+} from 'drizzle-orm/pg-core';
+
+/** Epoch-ms timestamp column. */
+const timestampMs = (name: string) => bigint(name, { mode: 'number' });
 
 /** A person. Identified solely by possessing their `token` (coat-check model). */
-export const users = sqliteTable('users', {
+export const users = pgTable('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   /** The bearer token embedded in the user's personal URL. No password. */
   token: text('token').notNull().unique(),
-  createdAt: integer('created_at').notNull(),
+  createdAt: timestampMs('created_at').notNull(),
 });
 
 /** A trip-planning group with a shareable invite and a ~6-month target window. */
-export const groups = sqliteTable('groups', {
+export const groups = pgTable('groups', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   /** Embedded in the invite link; anyone with it can join. */
@@ -29,14 +39,14 @@ export const groups = sqliteTable('groups', {
     .notNull()
     .references(() => users.id),
   /** Epoch ms of week index 0 (start of the planning window). */
-  windowStart: integer('window_start').notNull(),
+  windowStart: timestampMs('window_start').notNull(),
   /** Epoch ms of the end of the planning window. */
-  windowEnd: integer('window_end').notNull(),
-  createdAt: integer('created_at').notNull(),
+  windowEnd: timestampMs('window_end').notNull(),
+  createdAt: timestampMs('created_at').notNull(),
 });
 
 /** A user's membership in a group, carrying that member's trip inputs. */
-export const memberships = sqliteTable(
+export const memberships = pgTable(
   'memberships',
   {
     id: text('id').primaryKey(),
@@ -50,13 +60,13 @@ export const memberships = sqliteTable(
     homeAirport: text('home_airport'),
     /** The member's budget ceiling. Null until set. */
     budget: integer('budget'),
-    joinedAt: integer('joined_at').notNull(),
+    joinedAt: timestampMs('joined_at').notNull(),
   },
   (t) => [unique().on(t.groupId, t.userId)],
 );
 
 /** One painted "I could travel this week" cell, at week-level granularity. */
-export const availabilityPaints = sqliteTable(
+export const availabilityPaints = pgTable(
   'availability_paints',
   {
     id: text('id').primaryKey(),
@@ -66,7 +76,7 @@ export const availabilityPaints = sqliteTable(
     /** Index into the group's window: 0..weekCount-1. */
     weekIndex: integer('week_index').notNull(),
     /** Present + true = available. Rows are deleted when un-painted. */
-    available: integer('available', { mode: 'boolean' }).notNull(),
+    available: boolean('available').notNull(),
   },
   (t) => [unique().on(t.membershipId, t.weekIndex)],
 );
@@ -76,7 +86,7 @@ export const availabilityPaints = sqliteTable(
  * "alive" across refreshes. Several proposals share a `runId`; a failed run is
  * stored as a single row with `failureCode`/`failureReason` set and rank 0.
  */
-export const proposals = sqliteTable('proposals', {
+export const proposals = pgTable('proposals', {
   id: text('id').primaryKey(),
   groupId: text('group_id')
     .notNull()
@@ -98,11 +108,11 @@ export const proposals = sqliteTable('proposals', {
   /** Set instead of the trip fields when the run produced no valid proposal. */
   failureCode: text('failure_code'),
   failureReason: text('failure_reason'),
-  createdAt: integer('created_at').notNull(),
+  createdAt: timestampMs('created_at').notNull(),
 });
 
 /** An Accept / Suggest-change reaction by one member to one proposal. */
-export const reactions = sqliteTable(
+export const reactions = pgTable(
   'reactions',
   {
     id: text('id').primaryKey(),
@@ -116,7 +126,7 @@ export const reactions = sqliteTable(
     kind: text('kind').notNull(),
     /** Free-text note for a "suggest a change" reaction. */
     comment: text('comment'),
-    createdAt: integer('created_at').notNull(),
+    createdAt: timestampMs('created_at').notNull(),
   },
   (t) => [unique().on(t.proposalId, t.userId)],
 );

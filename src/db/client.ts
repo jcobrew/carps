@@ -1,20 +1,46 @@
 /**
- * The single Drizzle client. Swapping local <-> Turso is just the env vars:
- *   - Local dev:  TURSO_DATABASE_URL=file:./dev.db   (no auth token needed)
- *   - Production: TURSO_DATABASE_URL=libsql://<db>.turso.io  + TURSO_AUTH_TOKEN
+ * The single Drizzle client — Postgres via postgres-js (Supabase-friendly).
  *
- * Keeping DB access behind this one module means a future move to a different
- * persistence layer touches only this file.
+ * Use Supabase's "Transaction pooler" connection string (port 6543 with
+ * `?pgbouncer=true`). It's the right one for serverless because connections are
+ * short-lived. We pass `prepare: false` to postgres-js because PgBouncer in
+ * transaction mode does not support session-level prepared statements.
+ *
+ * The client is built lazily so module evaluation never requires the env var —
+ * this matters because Next.js imports server modules at build-time to collect
+ * page data, before any environment-provided runtime config exists.
  */
 import 'server-only';
-import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres, { type Sql } from 'postgres';
 import * as schema from './schema';
 
-const url = process.env.TURSO_DATABASE_URL ?? 'file:./dev.db';
-const authToken = process.env.TURSO_AUTH_TOKEN;
+type DB = ReturnType<typeof drizzle<typeof schema>>;
 
-const client = createClient(authToken ? { url, authToken } : { url });
+let _sql: Sql | undefined;
+let _db: DB | undefined;
 
-export const db = drizzle(client, { schema });
+function getDb(): DB {
+  if (_db) return _db;
+  const connectionString = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
+  if (!connectionString) {
+    throw new Error(
+      'DATABASE_URL is not set. Paste your Supabase Transaction pooler URL into .env.local',
+    );
+  }
+  _sql = postgres(connectionString, { prepare: false });
+  _db = drizzle(_sql, { schema });
+  return _db;
+}
+
+// Proxy so call sites keep using `db.query.users.findFirst(...)` etc. The real
+// client is created on the first property access, not on module import.
+export const db = new Proxy({} as DB, {
+  get(_target, prop) {
+    const real = getDb() as unknown as Record<string | symbol, unknown>;
+    const value = real[prop];
+    return typeof value === 'function' ? value.bind(real) : value;
+  },
+});
+
 export { schema };

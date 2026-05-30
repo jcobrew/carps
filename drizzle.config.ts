@@ -1,12 +1,16 @@
 import { defineConfig } from 'drizzle-kit';
 
-// `npm run db:push` creates/updates the tables. Uses the same env vars as the
-// app: a local file by default, or Turso when TURSO_* are set.
+// `npm run db:push` / `db:generate` against Postgres (Supabase).
+// For migrations, use the DIRECT connection (port 5432) rather than the
+// transaction pooler — pgbouncer can't run DDL safely.
 export default defineConfig({
   schema: './src/db/schema.ts',
-  dialect: 'turso',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.TURSO_DATABASE_URL ?? 'file:./dev.db',
-    authToken: process.env.TURSO_AUTH_TOKEN,
+    url:
+      process.env.DATABASE_URL_DIRECT ??
+      process.env.DATABASE_URL ??
+      process.env.POSTGRES_URL ??
+      '',
   },
 });
