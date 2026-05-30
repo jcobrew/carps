@@ -1,9 +1,13 @@
 /**
  * Typed read/write helpers — the only place the rest of the app touches the DB.
+ *
+ * Each function awaits `getDb()` once at the top; the call is memoized inside
+ * the client so subsequent invocations share one connection and (for PGlite)
+ * never re-run migrations.
  */
 import 'server-only';
 import { and, desc, eq, inArray } from 'drizzle-orm';
-import { db } from './client';
+import { getDb } from './client';
 import {
   users,
   groups,
@@ -26,6 +30,7 @@ const now = () => Date.now();
 // ---------------------------------------------------------------------------
 
 export async function createUser(name: string, email: string): Promise<User> {
+  const db = await getDb();
   const user = {
     id: newId(),
     name,
@@ -38,12 +43,14 @@ export async function createUser(name: string, email: string): Promise<User> {
 }
 
 export async function findUserByEmail(email: string): Promise<User | undefined> {
+  const db = await getDb();
   return db.query.users.findFirst({
     where: eq(users.email, email.toLowerCase()),
   });
 }
 
 export async function findUserByToken(token: string): Promise<User | undefined> {
+  const db = await getDb();
   return db.query.users.findFirst({ where: eq(users.token, token) });
 }
 
@@ -71,6 +78,7 @@ export async function createGroup(
   windowStart: number,
   windowEnd: number,
 ): Promise<Group> {
+  const db = await getDb();
   const group = {
     id: newId(),
     name,
@@ -89,17 +97,20 @@ export async function createGroup(
 export async function findGroupByInvite(
   inviteToken: string,
 ): Promise<Group | undefined> {
+  const db = await getDb();
   return db.query.groups.findFirst({
     where: eq(groups.inviteToken, inviteToken),
   });
 }
 
 export async function findGroupById(id: string): Promise<Group | undefined> {
+  const db = await getDb();
   return db.query.groups.findFirst({ where: eq(groups.id, id) });
 }
 
 /** Groups the user belongs to (most recent first). */
 export async function listGroupsForUser(userId: string): Promise<Group[]> {
+  const db = await getDb();
   const rows = await db
     .select({ group: groups })
     .from(memberships)
@@ -117,6 +128,7 @@ export async function findMembership(
   groupId: string,
   userId: string,
 ): Promise<Membership | undefined> {
+  const db = await getDb();
   return db.query.memberships.findFirst({
     where: and(eq(memberships.groupId, groupId), eq(memberships.userId, userId)),
   });
@@ -129,6 +141,7 @@ export async function ensureMembership(
 ): Promise<Membership> {
   const existing = await findMembership(groupId, userId);
   if (existing) return existing;
+  const db = await getDb();
   const membership = {
     id: newId(),
     groupId,
@@ -148,6 +161,7 @@ export interface MemberView {
 
 /** All memberships in a group with their user, ordered by join time. */
 export async function listMembers(groupId: string): Promise<MemberView[]> {
+  const db = await getDb();
   const rows = await db
     .select({ membership: memberships, user: users })
     .from(memberships)
@@ -162,6 +176,7 @@ export async function setMemberInputs(
   homeAirport: string,
   budget: number,
 ): Promise<void> {
+  const db = await getDb();
   await db
     .update(memberships)
     .set({ homeAirport, budget })
@@ -174,6 +189,7 @@ export async function setMemberInputs(
 
 /** Painted (available) week indices for one membership. */
 export async function getPaintedWeeks(membershipId: string): Promise<number[]> {
+  const db = await getDb();
   const rows = await db
     .select({ weekIndex: availabilityPaints.weekIndex })
     .from(availabilityPaints)
@@ -192,6 +208,7 @@ export async function setPaintedWeek(
   weekIndex: number,
   available: boolean,
 ): Promise<void> {
+  const db = await getDb();
   if (available) {
     await db
       .insert(availabilityPaints)
@@ -219,6 +236,7 @@ export async function getGroupPaints(
   const out: Record<string, number[]> = {};
   for (const id of membershipIds) out[id] = [];
   if (membershipIds.length === 0) return out;
+  const db = await getDb();
   const rows = await db
     .select({
       membershipId: availabilityPaints.membershipId,
@@ -243,11 +261,14 @@ export async function getGroupPaints(
 export async function insertProposalRows(
   rows: (typeof proposals.$inferInsert)[],
 ): Promise<void> {
-  if (rows.length > 0) await db.insert(proposals).values(rows);
+  if (rows.length === 0) return;
+  const db = await getDb();
+  await db.insert(proposals).values(rows);
 }
 
 /** The proposals (or failure row) from the most recent run, ranked. */
 export async function getLatestRun(groupId: string): Promise<ProposalRow[]> {
+  const db = await getDb();
   const latest = await db.query.proposals.findFirst({
     where: eq(proposals.groupId, groupId),
     orderBy: (p, { desc }) => desc(p.createdAt),
@@ -263,6 +284,7 @@ export async function getLatestRun(groupId: string): Promise<ProposalRow[]> {
 export async function getProposalById(
   id: string,
 ): Promise<ProposalRow | undefined> {
+  const db = await getDb();
   return db.query.proposals.findFirst({ where: eq(proposals.id, id) });
 }
 
@@ -278,6 +300,7 @@ export async function upsertReaction(
   kind: 'accept' | 'suggest',
   comment: string | null,
 ): Promise<void> {
+  const db = await getDb();
   await db
     .insert(reactions)
     .values({ id: newId(), proposalId, userId, kind, comment, createdAt: now() })
@@ -297,6 +320,7 @@ export async function listReactions(
   proposalIds: string[],
 ): Promise<ReactionView[]> {
   if (proposalIds.length === 0) return [];
+  const db = await getDb();
   return db
     .select({ reaction: reactions, user: users })
     .from(reactions)

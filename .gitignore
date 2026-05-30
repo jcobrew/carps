@@ -43,3 +43,6 @@ next-env.d.ts
 # local sqlite db (legacy, no longer used)
 dev.db
 dev.db-*
+
+# local pglite database (zero-setup local Postgres)
+local-db/
