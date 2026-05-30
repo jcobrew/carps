@@ -1,0 +1,410 @@
+[
+  {
+    "code": "BKK",
+    "name": "Bangkok",
+    "flights": {
+      "NRT": {
+        "cost": 400,
+        "durationHours": 6
+      },
+      "HND": {
+        "cost": 380,
+        "durationHours": 7
+      },
+      "GRU": {
+        "cost": 1970,
+        "durationHours": 29.5
+      },
+      "LHR": {
+        "cost": 810,
+        "durationHours": 14
+      },
+      "FRA": {
+        "cost": 780,
+        "durationHours": 13.5
+      },
+      "JFK": {
+        "cost": 1300,
+        "durationHours": 20
+      },
+      "SYD": {
+        "cost": 690,
+        "durationHours": 9.5
+      }
+    }
+  },
+  {
+    "code": "DAD",
+    "name": "Da Nang",
+    "flights": {
+      "NRT": {
+        "cost": 390,
+        "durationHours": 8
+      },
+      "HND": {
+        "cost": 430,
+        "durationHours": 8
+      },
+      "GRU": {
+        "cost": 2180,
+        "durationHours": 31
+      },
+      "LHR": {
+        "cost": 900,
+        "durationHours": 15.5
+      },
+      "FRA": {
+        "cost": 790,
+        "durationHours": 14.5
+      },
+      "JFK": {
+        "cost": 1440,
+        "durationHours": 21
+      },
+      "SYD": {
+        "cost": 790,
+        "durationHours": 10.5
+      }
+    }
+  },
+  {
+    "code": "SIN",
+    "name": "Singapore",
+    "flights": {
+      "NRT": {
+        "cost": 410,
+        "durationHours": 7.5
+      },
+      "HND": {
+        "cost": 480,
+        "durationHours": 7
+      },
+      "GRU": {
+        "cost": 2130,
+        "durationHours": 30.5
+      },
+      "LHR": {
+        "cost": 920,
+        "durationHours": 15
+      },
+      "FRA": {
+        "cost": 850,
+        "durationHours": 15
+      },
+      "JFK": {
+        "cost": 1460,
+        "durationHours": 21
+      },
+      "SYD": {
+        "cost": 800,
+        "durationHours": 10.5
+      }
+    }
+  },
+  {
+    "code": "DPS",
+    "name": "Bali (Denpasar)",
+    "flights": {
+      "NRT": {
+        "cost": 470,
+        "durationHours": 9
+      },
+      "HND": {
+        "cost": 490,
+        "durationHours": 9
+      },
+      "GRU": {
+        "cost": 2220,
+        "durationHours": 33
+      },
+      "LHR": {
+        "cost": 960,
+        "durationHours": 16.5
+      },
+      "FRA": {
+        "cost": 950,
+        "durationHours": 16
+      },
+      "JFK": {
+        "cost": 1430,
+        "durationHours": 22.5
+      },
+      "SYD": {
+        "cost": 820,
+        "durationHours": 12
+      }
+    }
+  },
+  {
+    "code": "HAN",
+    "name": "Hanoi",
+    "flights": {
+      "NRT": {
+        "cost": 380,
+        "durationHours": 7
+      },
+      "HND": {
+        "cost": 450,
+        "durationHours": 7
+      },
+      "GRU": {
+        "cost": 2050,
+        "durationHours": 30.5
+      },
+      "LHR": {
+        "cost": 810,
+        "durationHours": 15
+      },
+      "FRA": {
+        "cost": 800,
+        "durationHours": 14
+      },
+      "JFK": {
+        "cost": 1250,
+        "durationHours": 20.5
+      },
+      "SYD": {
+        "cost": 740,
+        "durationHours": 10
+      }
+    }
+  },
+  {
+    "code": "KUL",
+    "name": "Kuala Lumpur",
+    "flights": {
+      "NRT": {
+        "cost": 430,
+        "durationHours": 7
+      },
+      "HND": {
+        "cost": 460,
+        "durationHours": 7.5
+      },
+      "GRU": {
+        "cost": 2040,
+        "durationHours": 31
+      },
+      "LHR": {
+        "cost": 890,
+        "durationHours": 15
+      },
+      "FRA": {
+        "cost": 840,
+        "durationHours": 14.5
+      },
+      "JFK": {
+        "cost": 1430,
+        "durationHours": 21
+      },
+      "SYD": {
+        "cost": 750,
+        "durationHours": 10.5
+      }
+    }
+  },
+  {
+    "code": "MNL",
+    "name": "Manila",
+    "flights": {
+      "NRT": {
+        "cost": 390,
+        "durationHours": 7
+      },
+      "HND": {
+        "cost": 450,
+        "durationHours": 7
+      },
+      "GRU": {
+        "cost": 2190,
+        "durationHours": 31
+      },
+      "LHR": {
+        "cost": 860,
+        "durationHours": 15
+      },
+      "FRA": {
+        "cost": 850,
+        "durationHours": 14
+      },
+      "JFK": {
+        "cost": 1310,
+        "durationHours": 21
+      },
+      "SYD": {
+        "cost": 740,
+        "durationHours": 10
+      }
+    }
+  },
+  {
+    "code": "SGN",
+    "name": "Ho Chi Minh City",
+    "flights": {
+      "NRT": {
+        "cost": 380,
+        "durationHours": 6.5
+      },
+      "HND": {
+        "cost": 400,
+        "durationHours": 7
+      },
+      "GRU": {
+        "cost": 2100,
+        "durationHours": 30.5
+      },
+      "LHR": {
+        "cost": 850,
+        "durationHours": 14.5
+      },
+      "FRA": {
+        "cost": 800,
+        "durationHours": 14
+      },
+      "JFK": {
+        "cost": 1390,
+        "durationHours": 21
+      },
+      "SYD": {
+        "cost": 740,
+        "durationHours": 9.5
+      }
+    }
+  },
+  {
+    "code": "HKT",
+    "name": "Phuket",
+    "flights": {
+      "NRT": {
+        "cost": 410,
+        "durationHours": 8
+      },
+      "HND": {
+        "cost": 450,
+        "durationHours": 8.5
+      },
+      "GRU": {
+        "cost": 2080,
+        "durationHours": 31.5
+      },
+      "LHR": {
+        "cost": 880,
+        "durationHours": 15.5
+      },
+      "FRA": {
+        "cost": 830,
+        "durationHours": 15
+      },
+      "JFK": {
+        "cost": 1500,
+        "durationHours": 22
+      },
+      "SYD": {
+        "cost": 750,
+        "durationHours": 11
+      }
+    }
+  },
+  {
+    "code": "REP",
+    "name": "Siem Reap",
+    "flights": {
+      "NRT": {
+        "cost": 420,
+        "durationHours": 9
+      },
+      "HND": {
+        "cost": 460,
+        "durationHours": 8.5
+      },
+      "GRU": {
+        "cost": 2330,
+        "durationHours": 32.5
+      },
+      "LHR": {
+        "cost": 930,
+        "durationHours": 16
+      },
+      "FRA": {
+        "cost": 920,
+        "durationHours": 15.5
+      },
+      "JFK": {
+        "cost": 1470,
+        "durationHours": 22.5
+      },
+      "SYD": {
+        "cost": 830,
+        "durationHours": 11
+      }
+    }
+  },
+  {
+    "code": "CNX",
+    "name": "Chiang Mai",
+    "flights": {
+      "NRT": {
+        "cost": 420,
+        "durationHours": 8
+      },
+      "HND": {
+        "cost": 430,
+        "durationHours": 8.5
+      },
+      "GRU": {
+        "cost": 2000,
+        "durationHours": 31.5
+      },
+      "LHR": {
+        "cost": 860,
+        "durationHours": 15
+      },
+      "FRA": {
+        "cost": 880,
+        "durationHours": 15
+      },
+      "JFK": {
+        "cost": 1340,
+        "durationHours": 22
+      },
+      "SYD": {
+        "cost": 810,
+        "durationHours": 10.5
+      }
+    }
+  },
+  {
+    "code": "PNH",
+    "name": "Phnom Penh",
+    "flights": {
+      "NRT": {
+        "cost": 420,
+        "durationHours": 8.5
+      },
+      "HND": {
+        "cost": 440,
+        "durationHours": 7.5
+      },
+      "GRU": {
+        "cost": 2320,
+        "durationHours": 31.5
+      },
+      "LHR": {
+        "cost": 930,
+        "durationHours": 16
+      },
+      "FRA": {
+        "cost": 860,
+        "durationHours": 15.5
+      },
+      "JFK": {
+        "cost": 1430,
+        "durationHours": 21.5
+      },
+      "SYD": {
+        "cost": 780,
+        "durationHours": 11
+      }
+    }
+  }
+]
