@@ -59,6 +59,11 @@ npm run db:push                 # create the tables
 npm run dev                     # http://localhost:3000
 ```
 
+> **Serving behind a proxy / preview URL?** Next.js rejects Server Action POSTs
+> whose `origin` doesn't match the server's host (`Invalid Server Actions
+> request.`). Set `SERVER_ACTIONS_ALLOWED_ORIGINS` to the host(s) you reach the
+> app from — see `.env.example`. Plain `localhost` dev needs no change.
+
 Then walk the whole journey:
 
 1. Sign up (name + email, no password) — you get a private personal link.
