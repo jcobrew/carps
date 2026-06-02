@@ -17,7 +17,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col text-slate-900">
+      <body className="min-h-full flex flex-col text-slate-900" suppressHydrationWarning>
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-3">
             <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
